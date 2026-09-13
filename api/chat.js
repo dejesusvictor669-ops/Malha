@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Mensagem inválida' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = (process.env.ANTHROPIC_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada' });
   }
@@ -46,7 +46,14 @@ de trânsito em tempo real — deixe claro quando uma sugestão é uma estimativ
     if (!response.ok) {
       const errText = await response.text();
       console.error('Erro da API Anthropic:', errText);
-      return res.status(502).json({ error: 'Erro ao consultar a IA' });
+      // DEBUG TEMPORÁRIO
+      return res.status(502).json({
+        error: 'Erro ao consultar a IA',
+        details: errText || '(corpo vazio)',
+        status: response.status,
+        contentType: response.headers.get('content-type') || '(sem content-type)',
+        keyLength: apiKey.length
+      });
     }
 
     const data = await response.json();
@@ -54,6 +61,6 @@ de trânsito em tempo real — deixe claro quando uma sugestão é uma estimativ
     return res.status(200).json({ reply });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ error: 'Erro interno' });
+    return res.status(500).json({ error: 'Erro interno', details: String(err) });
   }
 }
