@@ -2,8 +2,9 @@
 // Function serverless da Vercel — roda no servidor, então a chave da API
 // nunca é exposta no navegador do usuário.
 //
+// Usa a API do Gemini (Google), que tem camada gratuita sem cartão de crédito.
 // Configuração necessária na Vercel:
-//   Settings > Environment Variables > ANTHROPIC_API_KEY = <sua chave>
+//   Settings > Environment Variables > GEMINI_API_KEY = <sua chave, gerada em aistudio.google.com/app/apikey>
 
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,9 +16,9 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Mensagem inválida' });
   }
 
-  const apiKey = (process.env.ANTHROPIC_API_KEY || '').trim();
+  const apiKey = (process.env.GEMINI_API_KEY || '').trim();
   if (!apiKey) {
-    return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada' });
+    return res.status(500).json({ error: 'GEMINI_API_KEY não configurada' });
   }
 
   const systemPrompt = `Você é o assistente de roteirização da Malha, uma empresa de logística
@@ -28,36 +29,28 @@ sensata. Seja direto e objetivo, em português, em no máximo 5 frases. Não inv
 de trânsito em tempo real — deixe claro quando uma sugestão é uma estimativa.`;
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'claude-sonnet-5',
-        max_tokens: 400,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: message }]
+        contents: [{ parts: [{ text: message }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] }
       })
     });
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('Erro da API Anthropic:', errText);
-      // DEBUG TEMPORÁRIO
+      console.error('Erro da API Gemini:', errText);
       return res.status(502).json({
         error: 'Erro ao consultar a IA',
         details: errText || '(corpo vazio)',
-        status: response.status,
-        contentType: response.headers.get('content-type') || '(sem content-type)',
-        keyLength: apiKey.length
+        status: response.status
       });
     }
 
     const data = await response.json();
-    const reply = data.content?.[0]?.text || 'Não consegui gerar uma sugestão agora.';
+    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Não consegui gerar uma sugestão agora.';
     return res.status(200).json({ reply });
   } catch (err) {
     console.error(err);

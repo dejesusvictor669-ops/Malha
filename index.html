@@ -518,7 +518,7 @@ async function enviarMensagem(){
       thinkingEl.textContent = data.reply;
     } else {
       // DEBUG TEMPORÁRIO: mostra o erro real vindo da function, pra facilitar o diagnóstico.
-      thinkingEl.textContent = `[DEBUG] ${data.error || 'erro desconhecido'} — status ${data.status || resp.status} — tipo:${data.contentType||'?'} — tamanho-chave:${data.keyLength||'?'} — ${data.details || ''}`;
+      thinkingEl.textContent = `[DEBUG] ${data.error || 'erro desconhecido'} — status ${data.status || resp.status} — ${data.details || ''}`;
     }
   }catch(err){
     thinkingEl.textContent = 'Assistente indisponível — precisa estar rodando na Vercel com a function /api/chat configurada.';
