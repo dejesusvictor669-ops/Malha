@@ -15,7 +15,7 @@ module.exports = async function handler(req, res) {
     return res.status(400).json({ error: 'Mensagem inválida' });
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = (process.env.ANTHROPIC_API_KEY || '').trim();
   if (!apiKey) {
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY não configurada' });
   }
@@ -46,9 +46,14 @@ de trânsito em tempo real — deixe claro quando uma sugestão é uma estimativ
     if (!response.ok) {
       const errText = await response.text();
       console.error('Erro da API Anthropic:', errText);
-      // DEBUG TEMPORÁRIO: manda o erro real pro navegador pra facilitar o diagnóstico.
-      // Remover o campo "details" depois que o assistente estiver funcionando.
-      return res.status(502).json({ error: 'Erro ao consultar a IA', details: errText, status: response.status });
+      // DEBUG TEMPORÁRIO
+      return res.status(502).json({
+        error: 'Erro ao consultar a IA',
+        details: errText || '(corpo vazio)',
+        status: response.status,
+        contentType: response.headers.get('content-type') || '(sem content-type)',
+        keyLength: apiKey.length
+      });
     }
 
     const data = await response.json();
