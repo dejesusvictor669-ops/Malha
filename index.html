@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Malha — Roteirização inteligente de cargas</title>
+<title>PrimeRota — Roteirização inteligente de cargas</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -52,11 +52,8 @@
     font-weight:800; font-size:1.3rem;
     display:flex; align-items:center; gap:10px;
   }
-  .brand-mark{
-    width:28px; height:28px; background:var(--amber);
-    display:flex; align-items:center; justify-content:center;
-    color:var(--ink); font-weight:800; font-size:.85rem;
-    transform:skew(-8deg);
+  .brand-logo{
+    height:38px; width:auto; display:block;
   }
   .nav-links{display:flex; gap:28px; font-size:.92rem;}
   .nav-links a{text-decoration:none; opacity:.85; transition:opacity .15s;}
@@ -232,7 +229,7 @@
 
 <header>
   <nav>
-    <div class="brand"><span class="brand-mark">M</span> Malha</div>
+    <div class="brand"><img src="assets/logo.png" alt="PrimeRota" class="brand-logo"></div>
     <div class="nav-links">
       <a href="#como-funciona">Como funciona</a>
       <a href="#cadastro">Cadastro de carga</a>
@@ -247,7 +244,7 @@
   <div class="wrap hero-grid">
     <div>
       <h1>Toda rota da Região Metropolitana de BH, organizada num painel só.</h1>
-      <p class="lead">A Malha separa a carga por peso e volumetria, monta o itinerário e acompanha cada caminhão até a entrega — pra quem faz roteirização não precisar mais montar rota no olho.</p>
+      <p class="lead">A PrimeRota separa a carga por peso e volumetria, monta o itinerário e acompanha cada caminhão até a entrega — pra quem faz roteirização não precisar mais montar rota no olho.</p>
       <div class="hero-cta">
         <a href="#cadastro" class="btn btn-amber">Cadastrar carga</a>
         <a href="#ia" class="btn btn-outline">Falar com o assistente</a>
@@ -275,7 +272,7 @@
       <div class="step">
         <div class="step-num">01</div>
         <h3>Informe a carga</h3>
-        <p>Região, peso total e volumetria. A Malha entende o que cabe em cada caminhão da frota.</p>
+        <p>Região, peso total e volumetria. A PrimeRota entende o que cabe em cada caminhão da frota.</p>
       </div>
       <div class="step">
         <div class="step-num">02</div>
@@ -373,7 +370,7 @@
     </div>
     <div class="admin-gate" id="admin-gate">
       <div class="field">
-        <label for="admin-pass">Senha de admin (demo: malha2026)</label>
+        <label for="admin-pass">Senha de admin (demo: primerota2026)</label>
         <input type="password" id="admin-pass" placeholder="••••••••">
       </div>
       <button class="btn btn-amber" style="border:none;" id="admin-login">Entrar</button>
@@ -387,16 +384,16 @@
 </section>
 
 <footer>
-  <div class="wrap">Malha — projeto acadêmico de roteirização logística.</div>
+  <div class="wrap">PrimeRota — projeto acadêmico de roteirização logística.</div>
 </footer>
 
 <script>
 /* ---------- Dados simulados ---------- */
 const FROTA_CAPACIDADE = { peso: 3500, volume: 18 };
 const CAMINHOES = [
-  { id: 'MLH-01', nome: 'Caminhão 01' },
-  { id: 'MLH-02', nome: 'Caminhão 02' },
-  { id: 'MLH-03', nome: 'Caminhão 03' }
+  { id: 'PR-01', nome: 'Caminhão 01' },
+  { id: 'PR-02', nome: 'Caminhão 02' },
+  { id: 'PR-03', nome: 'Caminhão 03' }
 ];
 const BAIRROS = ['Contagem — Eldorado','Betim — Citrolândia','BH — Barreiro','Ibirité — Centro','Sabará — Centro','Santa Luzia — Palmital'];
 const STATUS = [
@@ -407,10 +404,10 @@ const STATUS = [
 ];
 
 function loadState(){
-  return JSON.parse(localStorage.getItem('malha-state') || '{}');
+  return JSON.parse(localStorage.getItem('primerota-state') || '{}');
 }
 function saveState(state){
-  localStorage.setItem('malha-state', JSON.stringify(state));
+  localStorage.setItem('primerota-state', JSON.stringify(state));
 }
 
 /* ---------- Cadastro / separação de carga ---------- */
@@ -514,12 +511,7 @@ async function enviarMensagem(){
       body: JSON.stringify({ message: texto })
     });
     const data = await resp.json();
-    if (data.reply) {
-      thinkingEl.textContent = data.reply;
-    } else {
-      // DEBUG TEMPORÁRIO: mostra o erro real vindo da function, pra facilitar o diagnóstico.
-      thinkingEl.textContent = `[DEBUG] ${data.error || 'erro desconhecido'} — status ${data.status || resp.status} — ${data.details || ''}`;
-    }
+    thinkingEl.textContent = data.reply || 'Não consegui gerar uma resposta agora. Tenta de novo em alguns segundos.';
   }catch(err){
     thinkingEl.textContent = 'Assistente indisponível — precisa estar rodando na Vercel com a function /api/chat configurada.';
   }
@@ -532,7 +524,7 @@ document.getElementById('chat-input').addEventListener('keydown', function(e){
 /* ---------- Admin ---------- */
 document.getElementById('admin-login').addEventListener('click', function(){
   const pass = document.getElementById('admin-pass').value;
-  if(pass === 'malha2026'){
+  if(pass === 'primerota2026'){
     document.getElementById('admin-gate').style.display = 'none';
     document.getElementById('admin-dash').classList.add('active');
     atualizarAdminSePresente();
