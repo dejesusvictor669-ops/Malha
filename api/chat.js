@@ -29,7 +29,7 @@ sensata. Seja direto e objetivo, em português, em no máximo 5 frases. Não inv
 de trânsito em tempo real — deixe claro quando uma sugestão é uma estimativa.`;
 
   try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
