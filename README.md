@@ -1,4 +1,4 @@
-# Malha — roteirização de cargas (projeto acadêmico)
+# PrimeRota — roteirização de cargas (projeto acadêmico)
 
 ## O que tem no projeto
 - `index.html` — site completo (landing, cadastro de carga, rastreamento simulado, assistente de IA, área admin), sem framework, dados em `localStorage`.
